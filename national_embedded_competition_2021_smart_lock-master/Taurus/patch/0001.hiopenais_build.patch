@@ -1,0 +1,348 @@
+diff -urpBN hiopenais/build/boards/higo/Makefile hiopenais_modify/build/boards/higo/Makefile
+--- hiopenais/build/boards/higo/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/boards/higo/Makefile	2021-07-01 20:29:10.000000000 -0700
+@@ -0,0 +1,24 @@
++
++# Hisilicon HiOpenAIS cnn_mnist plug demo makefile
++include ../mk.param
++
++TARGET := higo.so
++
++# source files
++SMP_SRCS := $(BOARDS_HIGO_DIR)/higo_main.c
++SMP_SRCS += $(BOARDS_HIGO_DIR)/higv_cextfile.c
++SMP_SRCS += $(BOARDS_HIGO_DIR)/tpHal.c
++SMP_SRCS += $(BOARDS_HIGO_DIR)/playback.c
++SMP_SRCS += $(BOARDS_HIGO_DIR)/recorder.c
++SMP_SRCS += $(BOARDS_HIGO_DIR)/jpegEncoder.c
++CFLAGS += -I$(BOARDS_HIGO_DIR) -I$(BOARDS_HIGO_DIR)/component/higo/include -I$(BOARDS_HIGO_DIR)/component/higv/include  -I$(BOARDS_HIGO_DIR)/media_adpt/include
++CFLAGS += -Wl,-rpath=/usr/lib -ltde
++STATIC_LIBS += $(BOARDS_HIGO_DIR)/component/higv/lib/libhigv.a $(BOARDS_HIGO_DIR)/component/higo/lib/libhigo.a $(BOARDS_HIGO_DIR)/component/higo/lib/libhigoadp.a 
++STATIC_LIBS += $(BOARDS_HIGO_DIR)/media_adpt/lib/libmw_media_adpt.a $(BOARDS_HIGO_DIR)/media_adpt/lib/libuproc.a
++STATIC_LIBS += $(BOARDS_HIGO_DIR)/libs/libfreetype.a
++STATIC_LIBS += $(BOARDS_HIGO_DIR)/libs/libharfbuzz.a
++STATIC_LIBS += $(BOARDS_HIGO_DIR)/libs/libjpeg.a
++STATIC_LIBS += $(BOARDS_HIGO_DIR)/libs/libpng.a
++STATIC_LIBS += $(BOARDS_HIGO_DIR)/libs/libtimers.a
++STATIC_LIBS += $(BOARDS_HIGO_DIR)/libs/libz.a
++include ../linux.mk
+diff -urpBN hiopenais/build/boards/histreaming/Makefile hiopenais_modify/build/boards/histreaming/Makefile
+--- hiopenais/build/boards/histreaming/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/boards/histreaming/Makefile	2021-07-01 20:29:10.000000000 -0700
+@@ -0,0 +1,13 @@
++
++# Hisilicon HiOpenAIS cnn_mnist plug demo makefile
++include ../mk.param
++
++TARGET := histreaming.so
++
++# source files
++SMP_SRCS := $(BOARDS_HISTREAMING_DIR)/histreaming.c
++
++CFLAGS += -I$(BOARDS_HISTREAMING_DIR) -I$(BOARDS_HISTREAMING_DIR)/link/include
++CFLAGS += -Wl,-rpath=/usr/lib -L$(BOARDS_HISTREAMING_DIR) -lpthread
++STATIC_LIBS +=  $(BOARDS_HISTREAMING_DIR)/link/lib/liblink_core.a $(BOARDS_HISTREAMING_DIR)/link/lib/libsecurec.a  $(BOARDS_HISTREAMING_DIR)/link/lib/libcjson.a  $(BOARDS_HISTREAMING_DIR)/link/lib/libcoap.a
++include ../linux.mk
+diff -urpBN hiopenais/build/boards/ircut/Makefile hiopenais_modify/build/boards/ircut/Makefile
+--- hiopenais/build/boards/ircut/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/boards/ircut/Makefile	2021-07-01 20:29:10.000000000 -0700
+@@ -0,0 +1,12 @@
++
++# Hisilicon HiOpenAIS cnn_mnist plug demo makefile
++include ../mk.param
++
++TARGET := ircutservice.so
++
++# source files
++SMP_SRCS := $(BOARDS_IRCUTSERVICE_DIR)/ircutservice.c
++CFLAGS += -I$(BOARDS_IRCUTSERVICE_DIR)
++CFLAGS += -Wl,-rpath=/usr/lib
++
++include ../linux.mk
+diff -urpBN hiopenais/build/boards/linux.mk hiopenais_modify/build/boards/linux.mk
+--- hiopenais/build/boards/linux.mk	2021-04-22 02:44:02.000000000 -0700
++++ hiopenais_modify/build/boards/linux.mk	2021-07-01 20:29:10.000000000 -0700
+@@ -61,7 +61,7 @@ all: $(TARGET)
+ 
+ $(TARGET): $(OBJS) $(CPP_OBJS) | $(MKDIRS)
+ 	@echo ... ld $@
+-	@ $(CC) $(CFLAGS) -o $(TARGET_DIR)/$@ $^ -Wl,--start-group $(MPI_LIBS) -Wl,--end-group
++	@ $(CC) $(CFLAGS) -o $(TARGET_DIR)/$@ $^ -Wl,--start-group $(MPI_LIBS) -Wl,--end-group $(STATIC_LIBS)
+ 
+ $(CPP_OBJS) : $(OBJ_ROOT)/%.o : $(SRC_ROOT)/%.cpp
+ 	@echo @@@ c++ $^
+diff -urpBN hiopenais/build/boards/Makefile hiopenais_modify/build/boards/Makefile
+--- hiopenais/build/boards/Makefile	2021-04-25 06:52:36.000000000 -0700
++++ hiopenais_modify/build/boards/Makefile	2021-07-01 20:29:10.000000000 -0700
+@@ -1,6 +1,6 @@
+ # Hisilicon HiOpenAIS plug demo workspace makefile
+ 
+-TARGETS := taurus
++TARGETS := taurus rtsp_agent histreaming ircut higo wifi
+ 
+ TARGETS_clean := ${addsuffix _clean,${TARGETS}}
+ TARGETS_rebuild := ${addsuffix _rebuild,${TARGETS}}
+diff -urpBN hiopenais/build/boards/mk.param hiopenais_modify/build/boards/mk.param
+--- hiopenais/build/boards/mk.param	2021-04-28 20:28:11.000000000 -0700
++++ hiopenais_modify/build/boards/mk.param	2021-07-01 20:29:10.000000000 -0700
+@@ -59,6 +59,11 @@ export AUDIO_DIR := $(ROOT_DIR)/dependen
+ export CNN_MNIST_DIR := $(HIOPENAIS_SRC)/plug_demo/cnn_mnist
+ export CNN_TRASH_CLASSIFY_DIR := $(HIOPENAIS_SRC)/plug_demo/cnn_trash_classify
+ export NNIE_SAMPLE_PLUG_DIR := $(HIOPENAIS_SRC)/plug_demo/nnie_sample_plug
++export BOARDS_RTSP_AGENT_DIR := $(ROOT_DIR)/boards/rtsp_agent
++export BOARDS_HISTREAMING_DIR := $(ROOT_DIR)/boards/histreaming
++export BOARDS_IRCUTSERVICE_DIR := $(ROOT_DIR)/boards/ircut
++export BOARDS_HIGO_DIR := $(ROOT_DIR)/boards/higo
++export BOARDS_WIFI_DIR := $(ROOT_DIR)/boards/wifi
+ 
+ # 使用外部heap，用来做heap破坏检查，会损失性能，仅在debug时才使用
+ ifeq ($(CFG_EXT_HEAP), y)
+diff -urpBN hiopenais/build/boards/rtsp_agent/Makefile hiopenais_modify/build/boards/rtsp_agent/Makefile
+--- hiopenais/build/boards/rtsp_agent/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/boards/rtsp_agent/Makefile	2021-07-01 20:29:10.000000000 -0700
+@@ -0,0 +1,11 @@
++# Hisilicon HiOpenAIS cnn_mnist plug demo makefile
++include ../mk.param
++TARGET := rtsp_agent.so
++
++# source files
++SMP_SRCS := $(BOARDS_RTSP_AGENT_DIR)/rtsp_agent.c
++
++CFLAGS += -I$(BOARDS_RTSP_AGENT_DIR)
++CFLAGS += -Wl,-rpath=/usr/lib -L$(BOARDS_RTSP_AGENT_DIR) -lpthread
++STATIC_LIBS += $(BOARDS_RTSP_AGENT_DIR)/librtspserver.a
++include ../linux.mk
+diff -urpBN hiopenais/build/boards/taurus/Makefile hiopenais_modify/build/boards/taurus/Makefile
+--- hiopenais/build/boards/taurus/Makefile	2021-04-28 20:27:17.000000000 -0700
++++ hiopenais_modify/build/boards/taurus/Makefile	2021-07-01 20:29:10.000000000 -0700
+@@ -7,7 +7,6 @@ TARGET := taurus.so
+ # source files
+ SMP_SRCS := $(BOARDS_TAURUS_DIR)/taurus_adapt.c
+ 
+-SMP_SRCS += $(BOARDS_TAURUS_DIR)/wifi_apd_setup.c
+ SMP_SRCS += $(BOARDS_TAURUS_DIR)/button_control.c
+ 
+ SMP_SRCS += $(AUDIO_DIR)/audio_test.c
+diff -urpBN hiopenais/build/boards/wifi/Makefile hiopenais_modify/build/boards/wifi/Makefile
+--- hiopenais/build/boards/wifi/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/boards/wifi/Makefile	2021-07-01 20:29:10.000000000 -0700
+@@ -0,0 +1,13 @@
++
++# Hisilicon HiOpenAIS cnn_mnist plug demo makefile
++include ../mk.param
++
++TARGET := wifi.so
++
++# source files
++SMP_SRCS := $(BOARDS_WIFI_DIR)/wifi.c
++SMP_SRCS += $(BOARDS_WIFI_DIR)/wifi_apd_setup.c
++CFLAGS += -I$(BOARDS_WIFI_DIR)
++CFLAGS += -Wl,-rpath=/usr/lib
++
++include ../linux.mk
+diff -urpBN hiopenais/build/plug_demo/cnn_gender_classify/Makefile hiopenais_modify/build/plug_demo/cnn_gender_classify/Makefile
+--- hiopenais/build/plug_demo/cnn_gender_classify/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/plug_demo/cnn_gender_classify/Makefile	2021-07-19 22:15:16.462403500 -0700
+@@ -0,0 +1,22 @@
++# Hisilicon HiOpenAIS cnn_trash_classify plug demo makefile
++
++include ../mk.param
++
++TARGET := hi.cnn_gender_classify.plug
++
++CFLAGS += -I$(SVP_NNIE_SAMPLE_DIR)
++CFLAGS += -I$(SVP_SAMPLE_NNIE_SOFT_DIR)
++CFLAGS += -I$(FACE_DETECT)
++
++# source files
++SMP_SRCS := $(wildcard $(CNN_GENDER_CLASSIFY_DIR)/*.c)
++SMP_SRCS += $(NNIE_SAMPLE_SRCS)
++SMP_SRCS += $(MPP_SAMPLE_COMM_DIR)/sample_comm_vpss.c
++
++CFLAGS += -I$(AUDIO_DIR)
++CFLAGS += -Wl,-rpath=/usr/lib
++MPI_LIBS += -L$(FACE_DETECT)
++MPI_LIBS += -lhirfcn_face_detect
++
++# compile linux
++include ../linux.mk
+\ 文件尾没有换行符
+diff -urpBN hiopenais/build/plug_demo/cnn_hand_gesture/Makefile hiopenais_modify/build/plug_demo/cnn_hand_gesture/Makefile
+--- hiopenais/build/plug_demo/cnn_hand_gesture/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/plug_demo/cnn_hand_gesture/Makefile	2021-07-18 08:23:27.544305900 -0700
+@@ -0,0 +1,20 @@
++# Hisilicon HiOpenAIS yolov2_hand_detect plug demo makefile
++
++include ../mk.param
++
++TARGET := hi.cnn_hand_gesture.plug
++
++CFLAGS += -I$(SVP_NNIE_SAMPLE_DIR)
++CFLAGS += -I$(SVP_SAMPLE_NNIE_SOFT_DIR)
++CFLAGS += -I$(HISIGNALLING_DIR)
++CFLAGS += -I$(YOLOV2_HAND_DETECT_DIR)
++
++# source files
++SMP_SRCS := $(wildcard $(CNN_HAND_GESTURE_DIR)/*.c)
++SMP_SRCS += $(NNIE_SAMPLE_SRCS)
++SMP_SRCS += $(YOLOV2_HAND_DETECT_DIR)/yolov2_hand_detect.c
++SMP_SRCS += $(MPP_SAMPLE_COMM_DIR)/sample_comm_vpss.c
++SMP_SRCS += $(HISIGNALLING_DIR)/hisignalling.c
++
++# compile linux
++include ../linux.mk
+\ 文件尾没有换行符
+diff -urpBN hiopenais/build/plug_demo/hand_classify/Makefile hiopenais_modify/build/plug_demo/hand_classify/Makefile
+--- hiopenais/build/plug_demo/hand_classify/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/plug_demo/hand_classify/Makefile	2021-07-18 07:26:46.545240400 -0700
+@@ -0,0 +1,20 @@
++# Hisilicon HiOpenAIS cnn_trash_classify plug demo makefile
++
++include ../mk.param
++
++TARGET := hi.hand_classify.plug
++
++CFLAGS += -I$(SVP_NNIE_SAMPLE_DIR)
++CFLAGS += -I$(SVP_SAMPLE_NNIE_SOFT_DIR)
++CFLAGS += -I$(YOLOV2_HAND_DETECT_DIR)
++CFLAGS += -I$(HISIGNALLING_DIR)
++
++# source files
++SMP_SRCS := $(wildcard $(HAND_CLASSIFY_DIR)/*.c)
++SMP_SRCS += $(YOLOV2_HAND_DETECT_DIR)/yolov2_hand_detect.c
++SMP_SRCS += $(NNIE_SAMPLE_SRCS)
++SMP_SRCS += $(MPP_SAMPLE_COMM_DIR)/sample_comm_vpss.c
++SMP_SRCS += $(HISIGNALLING_DIR)/hisignalling.c
++
++# compile linux
++include ../linux.mk
+\ 文件尾没有换行符
+diff -urpBN hiopenais/build/plug_demo/linux.mk hiopenais_modify/build/plug_demo/linux.mk
+--- hiopenais/build/plug_demo/linux.mk	2021-06-01 05:17:02.000000000 -0700
++++ hiopenais_modify/build/plug_demo/linux.mk	2021-06-18 02:08:34.000000000 -0700
+@@ -14,7 +14,6 @@
+ # Hisilicon HiOpenAIS plug demo linux rule makefile
+ # 插件makefile可在最后include此文件
+ 
+-CXXCPP = arm-himix200-linux-g++
+ #====================================================
+ #	Source FileList
+ #====================================================
+@@ -30,7 +29,6 @@ OBJS 	 := $(SMP_SRCS:$(SRC_ROOT)%.c=$(OB
+ OBJS     := $(sort $(OBJS))
+ OBJS_DIR := $(sort $(dir $(OBJS)))
+ CPP_OBJS := $(CPP_SRCS:$(SRC_ROOT)%.cpp=$(OBJ_ROOT)%.o)
+-OBJS_DIR += $(sort $(dir $(CPP_OBJS)))
+ 
+ #====================================================
+ #	Create Directory
+@@ -71,7 +69,7 @@ $(TARGET): $(OBJS) $(CPP_OBJS) | $(MKDIR
+ 
+ $(CPP_OBJS) : $(OBJ_ROOT)/%.o : $(SRC_ROOT)/%.cpp
+ 	@echo @@@ c++ $^
+-	@$(CXXCPP) $(CFLAGS) -c "$<" -o "$@"
++	@$(CC) $(CFLAGS) -c "$<" -o "$@"
+ 
+ $(OBJS) : $(OBJ_ROOT)/%.o : $(SRC_ROOT)/%.c
+ 	@echo @@@ cc $^
+diff -urpBN hiopenais/build/plug_demo/Makefile hiopenais_modify/build/plug_demo/Makefile
+--- hiopenais/build/plug_demo/Makefile	2021-05-27 02:15:37.000000000 -0700
++++ hiopenais_modify/build/plug_demo/Makefile	2021-07-20 01:50:47.613592300 -0700
+@@ -1,6 +1,6 @@
+ # Hisilicon HiOpenAIS plug demo workspace makefile
+ 
+-TARGETS := cnn_mnist cnn_trash_classify tennis_detect
++TARGETS := resnet_face_classify hand_classify cnn_mnist cnn_trash_classify cnn_hand_gesture
+ 
+ TARGETS_clean := ${addsuffix _clean,${TARGETS}}
+ TARGETS_rebuild := ${addsuffix _rebuild,${TARGETS}}
+@@ -21,4 +21,4 @@ ${TARGETS_clean}:
+ ${TARGETS_rebuild}:
+ 	make -C ${patsubst %_rebuild,%,$@} clean
+ 	make -C ${patsubst %_rebuild,%,$@}
+-	@echo
+\ 文件尾没有换行符
++	@echo
+diff -urpBN hiopenais/build/plug_demo/mk.param hiopenais_modify/build/plug_demo/mk.param
+--- hiopenais/build/plug_demo/mk.param	2021-05-24 03:28:55.000000000 -0700
++++ hiopenais_modify/build/plug_demo/mk.param	2021-07-19 23:22:03.395598800 -0700
+@@ -44,6 +44,7 @@ export CFG_UTIL_DIR := $(ROOT_DIR)/depen
+ export EXT_HEAP_DIR := $(ROOT_DIR)/dependency/cns_heap
+ export CJSON_DIR := $(THIRD_PARTY_DIR)/src/cJSON
+ export OSD_DIR := $(ROOT_DIR)/dependency/osd
++export FACE_DETECT := $(ROOT_DIR)/dependency/svp/rfcn_face_detect
+ 
+ export INI_UTIL_INC_DIR := $(INI_UTIL_DIR)/include
+ export CFG_UTIL_INC_DIR := $(CFG_UTIL_DIR)/include
+@@ -52,16 +53,19 @@ export CFG_UTIL_INC_DIR := $(CFG_UTIL_DI
+ export OPENSSL_DIR := $(THIRD_PARTY_DIR)/output/openssl
+ export OPENSSL_INC_DIR := $(OPENSSL_DIR)/include
+ export OPENSSL_LIB_DIR := $(OPENSSL_DIR)/lib
+-export OPENCV_DIR      := $(THIRD_PARTY_DIR)/output/opencv
+-export OPENCV_INC_DIR  := $(OPENCV_DIR)/include/opencv4
+-export OPENCV_LIB_DIR  := $(OPENCV_DIR)/lib
+ 
+ # NNIE sample plug dir
+ export AUDIO_DIR := $(ROOT_DIR)/dependency/audio
+ export CNN_MNIST_DIR := $(HIOPENAIS_SRC)/plug_demo/cnn_mnist
+ export CNN_TRASH_CLASSIFY_DIR := $(HIOPENAIS_SRC)/plug_demo/cnn_trash_classify
+-export TENNIS_DETECT_DIR := $(HIOPENAIS_SRC)/plug_demo/tennis_detect
++export YOLOV2_HAND_DETECT_DIR := $(HIOPENAIS_SRC)/plug_demo/yolov2_hand_detect
++export CNN_HAND_GESTURE_DIR := $(HIOPENAIS_SRC)/plug_demo/cnn_hand_gesture
++export HAND_CLASSIFY_DIR := $(HIOPENAIS_SRC)/plug_demo/hand_classify
++export CNN_GENDER_CLASSIFY_DIR := $(HIOPENAIS_SRC)/plug_demo/cnn_gender_classify
+ export NNIE_SAMPLE_PLUG_DIR := $(HIOPENAIS_SRC)/plug_demo/nnie_sample_plug
++export HISIGNALLING_DIR := $(HIOPENAIS_SRC)/plug_demo/hisignalling
++export RESNET_FACE_CLASSIFY_DIR := $(HIOPENAIS_SRC)/plug_demo/resnet_face_classify
++
+ 
+ # 使用外部heap，用来做heap破坏检查，会损失性能，仅在debug时才使用
+ ifeq ($(CFG_EXT_HEAP), y)
+diff -urpBN hiopenais/build/plug_demo/resnet_face_classify/Makefile hiopenais_modify/build/plug_demo/resnet_face_classify/Makefile
+--- hiopenais/build/plug_demo/resnet_face_classify/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/plug_demo/resnet_face_classify/Makefile	2021-07-20 06:16:41.993162300 -0700
+@@ -0,0 +1,22 @@
++# Hisilicon HiOpenAIS cnn_trash_classify plug demo makefile
++
++include ../mk.param
++
++TARGET := hi.resnet_face_classify.plug
++
++CFLAGS += -I$(SVP_NNIE_SAMPLE_DIR)
++CFLAGS += -I$(SVP_SAMPLE_NNIE_SOFT_DIR)
++# CFLAGS += -I$(FACE_DETECT)
++CFLAGS += -I$(HISIGNALLING_DIR)
++
++# source files
++SMP_SRCS := $(wildcard $(RESNET_FACE_CLASSIFY_DIR)/*.c)
++SMP_SRCS += $(NNIE_SAMPLE_SRCS)
++SMP_SRCS += $(MPP_SAMPLE_COMM_DIR)/sample_comm_vpss.c
++SMP_SRCS += $(HISIGNALLING_DIR)/hisignalling.c
++
++# CFLAGS += -Wl,-rpath=/usr/lib
++# MPI_LIBS += -L$(FACE_DETECT)
++# MPI_LIBS += -lhirfcn_face_detect
++# compile linux
++include ../linux.mk
+\ 文件尾没有换行符
+diff -urpBN hiopenais/build/plug_demo/yolov2_hand_detect/Makefile hiopenais_modify/build/plug_demo/yolov2_hand_detect/Makefile
+--- hiopenais/build/plug_demo/yolov2_hand_detect/Makefile	1969-12-31 16:00:00.000000000 -0800
++++ hiopenais_modify/build/plug_demo/yolov2_hand_detect/Makefile	2021-06-29 20:48:19.000000000 -0700
+@@ -0,0 +1,16 @@
++# Hisilicon HiOpenAIS yolov2_hand_detect plug demo makefile
++
++include ../mk.param
++
++TARGET := hi.yolov2_hand_detect.plug
++
++CFLAGS += -I$(SVP_NNIE_SAMPLE_DIR)
++CFLAGS += -I$(SVP_SAMPLE_NNIE_SOFT_DIR)
++
++# source files
++SMP_SRCS := $(wildcard $(YOLOV2_HAND_DETECT_DIR)/*.c)
++SMP_SRCS += $(NNIE_SAMPLE_SRCS)
++SMP_SRCS += $(MPP_SAMPLE_COMM_DIR)/sample_comm_vpss.c
++
++# compile linux
++include ../linux.mk
+\ 文件尾没有换行符

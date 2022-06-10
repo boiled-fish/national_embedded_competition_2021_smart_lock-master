@@ -1,0 +1,9 @@
+hiopenais/src/aic_mng 和 hiopenais_modify/src/aic_mng 有共同的子目录
+hiopenais/src/hi_dev_id 和 hiopenais_modify/src/hi_dev_id 有共同的子目录
+hiopenais/src/hi_ext_util 和 hiopenais_modify/src/hi_ext_util 有共同的子目录
+hiopenais/src/hiopenais 和 hiopenais_modify/src/hiopenais 有共同的子目录
+hiopenais/src/lite_http 和 hiopenais_modify/src/lite_http 有共同的子目录
+hiopenais/src/mpp_help 和 hiopenais_modify/src/mpp_help 有共同的子目录
+hiopenais/src/plug_demo 和 hiopenais_modify/src/plug_demo 有共同的子目录
+hiopenais/src/uvc_dev 和 hiopenais_modify/src/uvc_dev 有共同的子目录
+只在 hiopenais_modify/src/ 存在：.vscode

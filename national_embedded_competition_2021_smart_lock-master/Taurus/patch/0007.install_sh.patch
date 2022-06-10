@@ -1,0 +1,2 @@
+78a79
+> 	patch -p1 < ${HIOPEAIS_PATH}/patch/0004.Taurus_sdk_nnie_sample.patch
