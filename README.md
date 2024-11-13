@@ -4,7 +4,7 @@
 
 #### Introduction
 
-全国大学生嵌入式竞赛海思赛道-智能门锁赛题-相关代码
+National University Embedded Contest Hathi Track-Smart Door Lock Competition Questions-Related Code
 
 #### Installation
 
